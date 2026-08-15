@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "web-push": "^3.6.6",
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "@anthropic-ai/sdk": "^0.20.0"
   }
 }
