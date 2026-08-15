@@ -28,6 +28,14 @@ module.exports = async (req, res) => {
       })
     });
     const data = await response.json();
+    
+    // 응답 전체를 로그로 확인
+    console.log('Anthropic response:', JSON.stringify(data));
+    
+    if (!data.content || !data.content[0]) {
+      return res.status(500).json({ error: 'Invalid response', data: data });
+    }
+    
     const translated = data.content[0].text.trim();
     res.status(200).json({ translated });
   } catch (e) {
