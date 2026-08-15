@@ -1,5 +1,3 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -12,17 +10,25 @@ module.exports = async (req, res) => {
   if (targetLang === 'ko') return res.status(200).json({ translated: text });
 
   try {
-    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
     const langName = targetLang === 'en' ? 'English' : 'Nepali (नेपाली)';
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: 'Translate the following Korean text to ' + langName + '. Return only the translated text, nothing else:\n\n' + text
-      }]
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: 'Translate the following Korean text to ' + langName + '. Return only the translated text, nothing else:\n\n' + text
+        }]
+      })
     });
-    const translated = message.content[0].text.trim();
+    const data = await response.json();
+    const translated = data.content[0].text.trim();
     res.status(200).json({ translated });
   } catch (e) {
     res.status(500).json({ error: e.message });
